@@ -1,0 +1,49 @@
+---
+- name: setup LDAP server and some sample users and a group
+  hosts: host1
+  become: true
+  remote_user: root
+  gather_facts: no
+  vars_files:
+    - ../group_vars/ldap_users/users.yml
+  roles:
+    - role: ldap
+      tags: ldap
+  tasks:
+    - name: Make sure we have added a group
+      community.general.ldap_entry:
+        dn: "ou=People,dc=localdomain,dc=com"
+        objectClass: organizationalUnit
+        state: present
+        bind_dn: cn=admin,dc=localdomain,dc=com
+        bind_pw: "admin"
+        server_uri: ldap://ldap.localdomain.com/
+        attributes:
+          description: An LDAP Group
+          ou: "People"
+      tags: add-group
+    - name: Make sure we have added users
+      ldap_entry:
+        dn: "uid={{ item.sn }},ou=People,dc=localdomain,dc=com"
+        objectClass: 
+          - inetOrgPerson
+          - posixAccount
+          - shadowAccount
+        state: present
+        bind_dn: cn=admin,dc=localdomain,dc=com
+        bind_pw: "admin"
+        server_uri: ldap://ldap.localdomain.com/
+        attributes:
+          description: An LDAP User
+          uid: "{{item.uid}}"
+          sn: "{{ item.sn }}"
+          givenName: "{{ item.givenName }}"
+          cn: "{{ item.cn }}"
+          mail: "{{ item.mail }}" 
+          userPassword: "{SSHA}r4BC9PnJsnO4r07PtCfwD83cGB1ZjXfA"
+          uidNumber: "10000"
+          gidNumber: "5001"
+          homeDirectory: "/home/{{ item.uid }}"
+          loginShell: "/bin/bash"
+      loop: "{{ ldap_users.usr }}"
+      tags: add-user

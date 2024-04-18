@@ -1,0 +1,20 @@
+---
+
+ldap_users:
+  usr:
+    - sn: "ali"
+      uid: "ali"
+      givenName: "yaghobi"
+      cn: "ali yaghobi"
+      mail: "ali.yaghobi@gmail.com"
+    - sn: "mostafa"
+      uid: "mostafa"
+      givenName: "yaghobi"
+      cn: "mostafa yaghobi"
+      mail: "mostafa.yaghobi@gmail.com"
+    - sn: "admin1"
+      uid: "mostafa"
+      givenName: "yaghobi"
+      givenName: "admin1"
+      cn: "admin1 admin1"
+      mail: "admin1.admin1@gmail.com"

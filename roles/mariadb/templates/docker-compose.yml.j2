@@ -1,0 +1,27 @@
+version: '3.5'
+
+services:
+  database:
+    image: "{{ image }}"
+    container_name: "{{ config.container_name }}"
+    restart: always
+    volumes:
+        - /data/mariadb/data:/var/lib/mysql
+        - ./conf.d/:/etc/mysql/conf.d/
+        - /data/mariadb/log:/var/log/mysql
+        - ./pam_ldap_config/pam_ldap_mariadb:/etc/pam.d/mariadb
+        - ./pam_ldap_config/ldap.conf:/etc/ldap.conf
+        - ./pam_ldap_config/ldap_ldap.conf:/etc/ldap/ldap.conf
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      - 'MARIADB_ROOT_PASSWORD={{ db_root_password }}'
+      - 'MARIADB_DATABASE={{ config.database }}'
+      - 'MARIADB_USER={{ config.user }}'
+      - 'MARIADB_PASSWORD={{ db_user_password }}'
+      - 'DEBIAN_FRONTEND=noninteractive'
+
+networks:
+  default:
+    name: {{ config.container_net }}
+    external: true

@@ -1,0 +1,122 @@
+---
+- name: create directory structure
+  file:
+    path: /home/apps/{{ item }}
+    state: directory
+    mode: 0755
+    owner: apps
+    group: apps
+  with_items:
+    - docker
+    - docker/keycloak
+
+- name: create docker-compose template
+  template:
+    src: docker-compose.yml.j2
+    dest: /home/apps/docker/keycloak/docker-compose.yml
+    mode: 0640
+    owner: apps
+    group: apps
+  vars:
+    config: "{{ test_db.database }}"
+
+- name: Installing Nginx
+  include_role:
+    name: nginx
+
+- name: config Nginx for keycloak panel
+  include_role:
+    name: nginx
+    tasks_from: keycloak
+
+- name: Create and Config LDAP user federation
+  community.general.keycloak_user_federation:
+    auth_keycloak_url: https://keycloak.test.com
+    auth_realm: "master"
+    auth_client_id: "admin-cli"
+    auth_username: "user"
+    auth_password: "bitnami"
+    realm: "master"
+    name: "ldap-mariadb"
+    state: "present"
+    provider_id: "ldap"
+    validate_certs: false
+    provider_type: org.keycloak.storage.UserStorageProvider
+    config:
+      priority: 0
+      enabled: true
+      cachePolicy: DEFAULT
+      editMode: WRITABLE
+      importEnabled: true
+      syncRegistrations: true
+      vendor: other
+      usernameLDAPAttribute: uid
+      rdnLDAPAttribute: uid
+      uuidLDAPAttribute: entryUUID
+      userObjectClasses: inetOrgPerson, organizationalPerson, posixAccount
+      connectionUrl: ldap://ldap.localdomain.com
+      usersDn: ou=People,dc=localdomain,dc=com
+      authType: simple
+      bindDn: cn=admin,dc=localdomain,dc=com
+      bindCredential: admin
+      searchScope: 1
+      validatePasswordPolicy: false
+      trustEmail: false
+      useTruststoreSpi: ldapsOnly
+      connectionPooling: false
+      pagination: false
+      allowKerberosAuthentication: false
+      debug: false
+      useKerberosForPasswordAuthentication: false
+    mappers:
+      - name: "full name"
+        providerId: "full-name-ldap-mapper"
+        providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        config:
+          ldap.full.name.attribute: cn
+          read.only: false
+          write.only: false
+      - name: "uidNumber"
+        providerId: "hardcoded-ldap-attribute-mapper"
+        providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        config:
+          ldap.attribute.name: "uidNumber"
+          ldap.attribute.value: "10000"
+          read.only: false
+          write.only: false
+      - name: "gidNumber"
+        providerId: "hardcoded-ldap-attribute-mapper"
+        providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        config:
+          ldap.attribute.name: "gidNumber"
+          ldap.attribute.value: "5001"
+          read.only: false
+          write.only: false
+      - name: "homeDirectory"
+        providerId: "hardcoded-ldap-attribute-mapper"
+        providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        config:
+          ldap.attribute.name: "homeDirectory"
+          ldap.attribute.value: "/home/mos"
+          read.only: false
+          write.only: false
+      - name: "loginShell"
+        providerId: "hardcoded-ldap-attribute-mapper"
+        providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        config:
+          ldap.attribute.name: "loginShell"
+          ldap.attribute.value: "/bin/bash"
+          read.only: false
+          write.only: false
+      - name: "first name"
+        providerId: "user-attribute-ldap-mapper"
+        providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        config:
+          read.only: false
+          write.only: false
+      - name: "last name"
+        providerId: "user-attribute-ldap-mapper"
+        providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        config:
+          read.only: false
+          write.only: false

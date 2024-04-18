@@ -1,0 +1,9 @@
+---
+
+test_db:
+  database:
+    database: 'test'
+    user: 'user02'
+    container_name: 'mariadb_ldap_test'
+    container_hostname: 'test_db'
+    container_net: test_net

@@ -1,0 +1,77 @@
+---
+- name: create directory structure
+  file:
+    path: /home/apps/{{ item }}
+    state: directory
+    mode: 0755
+    owner: apps
+    group: apps
+  with_items:
+    - docker
+    - docker/mariadb
+    - docker/mariadb/pam_ldap_config
+
+- name: create conf directory with mysql owner and group
+  file:
+    path: /home/apps/{{ item }}
+    state: directory
+    mode: 0755
+    owner: 1001
+    group: 1001
+  with_items:
+    - docker/mariadb/conf.d
+
+- name: create data directory with mysql owner and group
+  file:
+    path: /{{ item }}
+    state: directory
+    mode: 0755
+    owner: 999
+    group: 999
+  with_items:
+    - /data/
+    - /data/mariadb/
+    - /data/mariadb/data/
+    - /data/mariadb/log/
+
+- name: create docker-compose template
+  template:
+    src: docker-compose.yml.j2
+    dest: /home/apps/docker/mariadb/docker-compose.yml
+    mode: 0640
+    owner: apps
+    group: apps
+  vars:
+    config: "{{ test_db.database }}"
+
+- name: create a config file with mysql owner and group
+  template:
+    src: plugin.conf.j2
+    dest: /home/apps/docker/mariadb/conf.d/plugin.cnf
+    mode: 0640
+    owner: 999
+    group: 999
+
+- name: copy PAM authentication with LDAP config file for mariadb
+  copy:
+    src: files/pam_ldap_mariadb
+    dest: /home/apps/docker/mariadb/pam_ldap_config/pam_ldap_mariadb
+    mode: 0640
+    owner: apps
+    group: apps
+
+- name: copy LDAP config file
+  copy:
+    src: files/ldap.conf
+    dest: /home/apps/docker/mariadb/pam_ldap_config/ldap.conf
+    mode: 0640
+    owner: apps
+    group: apps
+
+- name: copy another LDAP config file
+  copy:
+    src: files/ldap_ldap.conf
+    dest: /home/apps/docker/mariadb/pam_ldap_config/ldap_ldap.conf
+    mode: 0640
+    owner: apps
+    group: apps

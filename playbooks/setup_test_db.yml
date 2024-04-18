@@ -1,0 +1,85 @@
+---
+- name: Setup a test mariadb server
+  hosts: host1
+  become: true
+  remote_user: root
+  gather_facts: yes
+  vars_files:
+    - ../group_vars/mariadb/db.yml
+    - ../group_vars/secret/db.enc
+    - ../group_vars/ldap_users/users.yml
+  roles:
+    - role: docker
+      tags: docker
+      vars:
+        docker_users:
+          - apps
+        docker_compose_version: "v2.19.1"
+    - role: mariadb
+      tags: mariadb
+      vars:
+        image: 'mariadb:10.7.1'
+  tasks:
+    - block:
+        - name: Start Mariadb container 
+          shell: docker-compose -f /home/apps/docker/mariadb/docker-compose.yml up -d
+      tags: startdb
+    - block:
+        - name: install extra packages on the dest host
+          apt:
+            name: [ pip ]
+        - name: Install docker python package
+          pip:
+            name: docker
+        - name: Create a network
+          docker_network:
+            name: "{{ test_db.database.container_net }}"
+      tags: mknet
+    - block:
+        - name: Update apt inside of the container
+          community.docker.docker_container_exec:
+            container: "{{ test_db.database.container_name }}"
+            command: apt update
+        - name: Install nslcd inside of the mariadb container
+          community.docker.docker_container_exec:
+            container: "{{ test_db.database.container_name }}"
+            command: apt install -y nslcd
+        - name: Comment two lines of /etc/nslcd.conf inside of the container
+          community.docker.docker_container_exec:
+            container: "{{ test_db.database.container_name }}"
+            command: sed -i '/\(binddn\|bindpw\)/s/^/#/' /etc/nslcd.conf
+        - name: Start nslcd inside of the mariadb container
+          community.docker.docker_container_exec:
+            container: "{{ test_db.database.container_name }}"
+            command: /etc/init.d/nslcd start
+      tags: nslcd
+    - block:
+        - name: Install PyMySQL python package
+          pip:
+            name: pymysql
+            # It seems there is an issue when setting plugin_auth_string, the mysql_user module uses `BY` insted of `USING` and mariadb:10.7.1 encounter a syntax error. So I created a user directly by running a query
+            #        - name: Create user with PAM authentication, all database privileges and 'WITH GRANT OPTION' in test
+            #          community.mysql.mysql_user:
+            #            login_host: "127.0.0.1"
+            #            login_port: 3306
+            #            #            login_user: "{{ test_db.database.user }}"
+            #            login_user: "root"
+            #            login_password: "{{ db_root_password }}"
+            #            name: bob
+            #            state: present
+            #            plugin: "pam"
+            #            #            plugin_auth_string: "mariadb"
+            #            priv:
+            #              'test.*': 'ALL,GRANT'
+        - name: Create a database user
+          community.mysql.mysql_query:
+            login_host: "127.0.0.1"
+            login_port: 3306
+            login_user: "root"
+            login_password: "{{ db_root_password }}"
+            query: 
+              - CREATE USER {{ item.sn }} IDENTIFIED WITH pam USING "mariadb"
+              - GRANT ALL ON test.* TO '{{ item.sn }}'@'%'
+              - FLUSH PRIVILEGES
+          loop: "{{ ldap_users.usr }}"
+      tags: mkdbuser

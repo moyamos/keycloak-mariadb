@@ -1,0 +1,15 @@
+---
+- name: install nginx
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - nginx
+    - nginx-common
+    - nginx-extras
+
+- name: disable default placeholder page
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload nginx

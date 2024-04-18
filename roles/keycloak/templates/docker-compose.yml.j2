@@ -1,0 +1,24 @@
+version: '3.5'
+
+services:
+  postgresql:
+    image: "docker.io/bitnami/postgresql:11"
+    container_name: "keycloak_db"
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_USERNAME=bn_keycloak
+      - POSTGRESQL_DATABASE=bitnami_keycloak
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+  keycloak:
+    image: docker.io/bitnami/keycloak:21
+    container_name: "keycloak"
+    depends_on:
+      - postgresql
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  postgresql_data:
+    driver: local

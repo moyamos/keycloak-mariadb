@@ -1,0 +1,19 @@
+---
+- name: add keycloak nginx configs
+  template:
+    src: keycloak.j2
+    dest: /etc/nginx/sites-available/keycloak.conf
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: reload nginx
+
+- name: enable keycloack nginx configs
+  file:
+    src: /etc/nginx/sites-available/keycloak.conf
+    path: /etc/nginx/sites-enabled/keycloak.conf
+    owner: root
+    group: root
+    state: link
+  notify: reload nginx
+  when: not ansible_check_mode

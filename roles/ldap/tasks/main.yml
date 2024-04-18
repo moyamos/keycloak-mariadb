@@ -1,0 +1,42 @@
+---
+
+- name: copy a sample debconf value for slapd package
+  copy:
+    src: files/debconf-slapd.conf
+    dest: /tmp/debconf-slapd.conf
+
+- name: insert new values into the debconf database
+  shell: cat /tmp/debconf-slapd.conf | debconf-set-selections
+
+- name: install packages
+  apt:
+    name: [ pip, libsasl2-dev, python-dev, libldap2-dev, libssl-dev, slapd, ldap-utils ]
+    state: present
+
+- name: Remove the debconf file
+  file:
+    path: /tmp/debconf-slapd.conf
+    state: absent    
+
+- name: Install python-ldap python package
+  pip:
+    name: python-ldap
+
+- name: copy ldap.config file
+  copy:
+    src: files/ldap.conf
+    dest: /etc/ldap/ldap.conf
+
+- name: Test for localdomain.com record in the local hosts
+  shell: grep 'localdomain.com' /etc/hosts | tr -d "\n" | cat
+  register: test_localdomain
+  changed_when: False
+
+- name: Add localdomain.com record in the local hosts 
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    insertafter: 'localhost'
+    line: "xx.xx.xx.xx localdomain.com\n
+xx.xx.xx.xx ldap.localdomain.com"
+  when: test_localdomain.stdout == ""
