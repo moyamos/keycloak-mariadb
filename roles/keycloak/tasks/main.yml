@@ -31,7 +31,7 @@
 
 - name: Create and Config LDAP user federation
   community.general.keycloak_user_federation:
-    auth_keycloak_url: https://keycloak.test.com
+    auth_keycloak_url: https://{{ domain }}
     auth_realm: "master"
     auth_client_id: "admin-cli"
     auth_username: "user"
