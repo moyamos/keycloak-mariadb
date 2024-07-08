@@ -1,0 +1,16 @@
+---
+- name: Clone a github repository
+  git:
+    repo: https://github.com/acmesh-official/acme.sh
+    dest: /home/apps/acme
+    clone: yes
+
+- name: install acme
+  command: ./acme.sh --install -m {{ acme_account_email }}
+  args:
+    chdir: /home/apps/acme
+
+- name: set HETZNER token
+  lineinfile:
+    path: /root/.acme.sh/account.conf
+    line: "HETZNER_Token='{{ hetzner_api_token }}'"

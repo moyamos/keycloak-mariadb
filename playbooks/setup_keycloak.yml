@@ -14,4 +14,6 @@
     - role: keycloak
       vars:
         domain: "keycloak.test.com"
+        acme_account_email: "mostafa.yaghobi@gmail.com"
+        hetzner_api_token: "<hetzner_api_token>"
       tags: keycloak

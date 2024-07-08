@@ -20,6 +20,13 @@
   vars:
     config: "{{ test_db.database }}"
 
+- name: docker compose up
+  shell: docker-compose -f /home/apps/docker/keycloak/docker-compose.yml up -d
+
+- name: install acme
+  include_role:
+    name: acme
+
 - name: Installing Nginx
   include_role:
     name: nginx
