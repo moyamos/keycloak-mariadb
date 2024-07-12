@@ -6,7 +6,8 @@
     owner: "root"
     group: "root"
     mode: 0644
-  notify: reload nginx
+  notify:
+    - reload nginx
 
 - name: enable keycloack nginx configs
   file:
@@ -15,5 +16,6 @@
     owner: root
     group: root
     state: link
-  notify: reload nginx
+  notify:
+    - reload nginx
   when: not ansible_check_mode

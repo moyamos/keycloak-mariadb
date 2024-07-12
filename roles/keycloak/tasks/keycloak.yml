@@ -1,48 +1,7 @@
 ---
-- name: create directory structure
-  file:
-    path: /home/apps/{{ item }}
-    state: directory
-    mode: 0755
-    owner: apps
-    group: apps
-  with_items:
-    - docker
-    - docker/keycloak
-
-- name: create docker-compose template
-  template:
-    src: docker-compose.yml.j2
-    dest: /home/apps/docker/keycloak/docker-compose.yml
-    mode: 0640
-    owner: apps
-    group: apps
-  vars:
-    config: "{{ test_db.database }}"
-
-- name: docker compose up
-  shell: docker-compose -f /home/apps/docker/keycloak/docker-compose.yml up -d
-
-- name: install acme
-  include_role:
-    name: acme
-
-- name: issue SSL certificate with acme
-  shell: /home/apps/acme/acme.sh --issue --use-wget --dns dns_hetzner -d {{ keycloak.domain }} --server letsencrypt
-  ignore_errors: true
-  args:
-    executable: /bin/bash
-
-- name: Installing Nginx
-  include_role:
-    name: nginx
-
-- name: config Nginx for keycloak panel
-  include_role:
-    name: nginx
-    tasks_from: keycloak
 
 - name: Create and Config LDAP user federation
+  tags: keycloak
   community.general.keycloak_user_federation:
     auth_keycloak_url: https://{{ keycloak.domain }}
     auth_realm: "master"

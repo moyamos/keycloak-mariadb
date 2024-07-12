@@ -1,5 +1,5 @@
 ---
-- name: Setup Keycloak server
+- name: Setup Keycloak server requirement
   hosts: host1
   become: true
   remote_user: root
@@ -13,8 +13,25 @@
         docker_users:
           - apps
         docker_compose_version: "v2.19.1"
-    - role: keycloak
-      vars:
-        acme_account_email: "{{ keycloak.acme_account_email }}"
-        hetzner_api_token: "{{ keycloak.hetzner_api_token }}"
+  tasks:
+    - block:
+        - name: Keycloak requirements
+          include_role:
+            name: keycloak
+            tasks_from: req
+          vars:
+            acme_account_email: "{{ keycloak.acme_account_email }}"
+            hetzner_api_token: "{{ keycloak.hetzner_api_token }}"
+      tags: req
+
+- name: Config Keycloak
+  hosts: host1
+  vars_files:
+    - ../group_vars/keycloak/common.yml
+  tasks:
+    - block:
+        - name: Keycloak config
+          include_role:
+            name: keycloak
+            tasks_from: keycloak
       tags: keycloak
