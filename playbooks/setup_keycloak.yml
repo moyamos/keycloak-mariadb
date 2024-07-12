@@ -4,6 +4,8 @@
   become: true
   remote_user: root
   gather_facts: yes
+  vars_files:
+    - ../group_vars/keycloak/common.yml
   roles:
     - role: docker
       tags: docker
@@ -13,7 +15,6 @@
         docker_compose_version: "v2.19.1"
     - role: keycloak
       vars:
-        domain: "keycloak.test.com"
-        acme_account_email: "mostafa.yaghobi@gmail.com"
-        hetzner_api_token: "<hetzner_api_token>"
+        acme_account_email: "{{ keycloak.acme_account_email }}"
+        hetzner_api_token: "{{ keycloak.hetzner_api_token }}"
       tags: keycloak

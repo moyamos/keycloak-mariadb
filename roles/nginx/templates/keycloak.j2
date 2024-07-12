@@ -1,5 +1,5 @@
 server {
-  server_name {{ domain }};
+  server_name {{ keycloak.domain }};
 
   location /health_check {
     add_header Content-Type text/plain;
@@ -17,16 +17,16 @@ server {
   }
 
   listen 443 ssl;
-  ssl_certificate /root/.acme.sh/{{ domain }}.com_ecc/{{ domain }}.cer;
-  ssl_certificate_key /root/.acme.sh/{{ domain }}_ecc/{{ domain }}.key;
+  ssl_certificate /root/.acme.sh/{{ keycloak.domain }}_ecc/{{ keycloak.domain }}.cer;
+  ssl_certificate_key /root/.acme.sh/{{ keycloak.domain }}_ecc/{{ keycloak.domain }}.key;
 }
 
 server {
-  if ($host = keycloak.test.com) {
+  if ($host = {{ keycloak.domain }}) {
     return 301 https://$host$request_uri;
   }
 
-  server_name {{ domain }};
+  server_name {{ keycloak.domain }};
 
   listen 80;
   return 404;

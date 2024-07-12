@@ -27,6 +27,12 @@
   include_role:
     name: acme
 
+- name: issue SSL certificate with acme
+  shell: /home/apps/acme/acme.sh --issue --use-wget --dns dns_hetzner -d {{ keycloak.domain }} --server letsencrypt
+  ignore_errors: true
+  args:
+    executable: /bin/bash
+
 - name: Installing Nginx
   include_role:
     name: nginx
@@ -38,7 +44,7 @@
 
 - name: Create and Config LDAP user federation
   community.general.keycloak_user_federation:
-    auth_keycloak_url: https://{{ domain }}
+    auth_keycloak_url: https://{{ keycloak.domain }}
     auth_realm: "master"
     auth_client_id: "admin-cli"
     auth_username: "user"
