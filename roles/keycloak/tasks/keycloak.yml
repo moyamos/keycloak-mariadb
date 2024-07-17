@@ -6,8 +6,8 @@
     auth_keycloak_url: https://{{ keycloak.domain }}
     auth_realm: "master"
     auth_client_id: "admin-cli"
-    auth_username: "user"
-    auth_password: "bitnami"
+    auth_username: "{{ keycloak.admin_user }}"
+    auth_password: "{{ keycloak_admin_password }}"
     realm: "master"
     name: "ldap-mariadb"
     state: "present"

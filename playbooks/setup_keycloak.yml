@@ -6,6 +6,7 @@
   gather_facts: yes
   vars_files:
     - ../group_vars/keycloak/common.yml
+    - ../group_vars/secret/keycloak.enc
   roles:
     - role: docker
       tags: docker
@@ -21,13 +22,13 @@
             tasks_from: req
           vars:
             acme_account_email: "{{ keycloak.acme_account_email }}"
-            hetzner_api_token: "{{ keycloak.hetzner_api_token }}"
       tags: req
 
 - name: Config Keycloak
   hosts: host1
   vars_files:
     - ../group_vars/keycloak/common.yml
+    - ../group_vars/secret/keycloak.enc
   tasks:
     - block:
         - name: Keycloak config

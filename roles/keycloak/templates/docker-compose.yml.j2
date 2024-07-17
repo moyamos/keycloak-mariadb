@@ -18,6 +18,9 @@ services:
       - postgresql
     ports:
       - "127.0.0.1:8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN={{ keycloak.admin_user }}
+      - KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}
 
 volumes:
   postgresql_data:
