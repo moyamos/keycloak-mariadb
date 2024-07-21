@@ -3,7 +3,7 @@
   - It is assumed that one needs to install the components on a Debian-based operating system to keep the implementation simple.
   - The LDAP server is set up on a machine's host to reduce the setup complexity in the beginning.
     - The OpenLDAP package installation and reconfiguration process with `apt` and `dpkg-reconfigure` usually uses an interactive UI. The default deb package configurations are kept in [`./roles/ldap/files/debconf-slapd.conf`](./roles/ldap/files/debconf-slapd.conf) and set during the installation step to automate the configuration noninteractively.
-    - The `slappasswd` utility can be used to generate a password for `userPassword`. The utility is part of the `slapd` package in Ubuntu 20.04.
+    - The `slappasswd` utility can be used to generate a password for `userPassword`. The utility is part of the `slapd` package in Ubuntu 20.04. For more information one can look [`here`](https://www.openldap.org/faq/data/cache/347.html)
   - A MariaDB server configured in a Docker container to authenticate its users via PAM (Pluggable Authentication Module) plugin. In this case, LDAP is used.
     - The secret of `root` and `user02` users of the MariaDB service are encrypted in [`./group_vars/secret/db.enc`](./group_vars/secret/db.enc).
     - To run its playbook, one can use `ansible-playbook --ask-vault-pass ./playbooks/setup_test_db.yml`.

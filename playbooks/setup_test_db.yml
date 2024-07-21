@@ -7,7 +7,7 @@
   vars_files:
     - ../group_vars/mariadb/db.yml
     - ../group_vars/secret/db.enc
-    - ../group_vars/ldap_users/users.yml
+    - ../group_vars/ldap/users.yml
   roles:
     - role: docker
       tags: docker

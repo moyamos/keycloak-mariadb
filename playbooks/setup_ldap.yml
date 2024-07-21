@@ -5,7 +5,8 @@
   remote_user: root
   gather_facts: no
   vars_files:
-    - ../group_vars/ldap_users/users.yml
+    - ../group_vars/ldap/users.yml
+    - ../group_vars/ldap/common.yml
   roles:
     - role: ldap
       tags: ldap
@@ -40,7 +41,7 @@
           givenName: "{{ item.givenName }}"
           cn: "{{ item.cn }}"
           mail: "{{ item.mail }}" 
-          userPassword: "{SSHA}r4BC9PnJsnO4r07PtCfwD83cGB1ZjXfA"
+          userPassword: "{SSHA}d9xAbJJz1GdIypU8AFbBM9TWDjO4yHOV"
           uidNumber: "10000"
           gidNumber: "5001"
           homeDirectory: "/home/{{ item.uid }}"

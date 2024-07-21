@@ -37,6 +37,5 @@
     path: /etc/hosts
     state: present
     insertafter: 'localhost'
-    line: "xx.xx.xx.xx localdomain.com\n
-xx.xx.xx.xx ldap.localdomain.com"
+    line: "{{ ldap.local_ip }} localdomain.com\n{{ ldap.local_ip }} ldap.localdomain.com"
   when: test_localdomain.stdout == ""
