@@ -2,25 +2,34 @@ version: '3.5'
 
 services:
   postgresql:
-    image: "docker.io/bitnami/postgresql:11"
+    image: "postgres:14.2"
     container_name: "keycloak_db"
     restart: always
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - POSTGRESQL_USERNAME=bn_keycloak
-      - POSTGRESQL_DATABASE=bitnami_keycloak
+      - 'POSTGRES_USER=bn_keycloak'
+      - 'POSTGRES_DB=bitnami_keycloak'
+      - 'POSTGRES_PASSWORD=keycloak'
     volumes:
       - 'postgresql_data:/bitnami/postgresql'
   keycloak:
-    image: docker.io/bitnami/keycloak:21
+    image: keycloak/keycloak:nightly
     container_name: "keycloak"
     depends_on:
       - postgresql
     ports:
       - "127.0.0.1:8080:8080"
+    command: start-dev
     environment:
-      - KEYCLOAK_ADMIN={{ keycloak.admin_user }}
-      - KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}
+      - 'KEYCLOAK_CREATE_ADMIN_USER=true'
+      - 'KEYCLOAK_ADMIN={{ keycloak.admin_user }}'
+      - 'KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}'
+      - 'KEYCLOAK_DATABASE_HOST=postgresql'
+      - 'KEYCLOAK_DATABASE_PORT=5432'
+      - 'KEYCLOAK_DATABASE_NAME=bitnami_keycloak'
+      - 'KEYCLOAK_DATABASE_USER=bn_keycloak'
+      - 'KEYCLOAK_DATABASE_PASSWORD=keycloak'
+      - 'KC_HOSTNAME=https://{{ keycloak.domain }}'
+      - 'KC_HOSTNAME_ADMIN=https://{{ keycloak.domain }}'
 
 volumes:
   postgresql_data:
