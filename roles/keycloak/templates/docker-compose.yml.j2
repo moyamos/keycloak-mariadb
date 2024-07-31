@@ -6,9 +6,9 @@ services:
     container_name: "keycloak_db"
     restart: always
     environment:
-      - 'POSTGRES_USER=bn_keycloak'
-      - 'POSTGRES_DB=bitnami_keycloak'
-      - 'POSTGRES_PASSWORD=keycloak'
+      - 'POSTGRES_USER={{ keycloak.db.user }}'
+      - 'POSTGRES_DB={{ keycloak.db.db_name }}'
+      - 'POSTGRES_PASSWORD={{ keycloak.db.password }}'
     volumes:
       - 'postgresql_data:/var/lib/postgresql/data'
   keycloak:
@@ -26,9 +26,9 @@ services:
       - 'KC_DB=postgres'
       - 'KC_DB_URL_HOST=postgresql'
       - 'KC_DB_URL_PORT=5432'
-      - 'KC_DB_URL_DATABASE=bitnami_keycloak'
-      - 'KC_DB_USERNAME=bn_keycloak'
-      - 'KC_DB_PASSWORD=keycloak'
+      - 'KC_DB_URL_DATABASE={{ keycloak.db.db_name }}'
+      - 'KC_DB_USERNAME={{ keycloak.db.user }}'
+      - 'KC_DB_PASSWORD={{ keycloak.db.password }}'
       - 'KC_HOSTNAME=https://{{ keycloak.domain }}'
       - 'KC_HOSTNAME_ADMIN=https://{{ keycloak.domain }}'
 

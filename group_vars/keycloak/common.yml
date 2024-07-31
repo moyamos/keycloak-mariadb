@@ -4,3 +4,7 @@ keycloak:
   domain: "keycloak.test.com"
   acme_account_email: "mostafa.yaghobi@gmail.com"
   admin_user: admin_user
+  db:
+    user: "bn_keycloak"
+    password: "keycloak"
+    db_name: "bitnami_keycloak"
