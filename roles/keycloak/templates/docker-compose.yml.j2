@@ -10,7 +10,7 @@ services:
       - 'POSTGRES_DB=bitnami_keycloak'
       - 'POSTGRES_PASSWORD=keycloak'
     volumes:
-      - 'postgresql_data:/bitnami/postgresql'
+      - 'postgresql_data:/var/lib/postgresql/data'
   keycloak:
     image: keycloak/keycloak:nightly
     container_name: "keycloak"
@@ -23,11 +23,12 @@ services:
       - 'KEYCLOAK_CREATE_ADMIN_USER=true'
       - 'KEYCLOAK_ADMIN={{ keycloak.admin_user }}'
       - 'KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}'
-      - 'KEYCLOAK_DATABASE_HOST=postgresql'
-      - 'KEYCLOAK_DATABASE_PORT=5432'
-      - 'KEYCLOAK_DATABASE_NAME=bitnami_keycloak'
-      - 'KEYCLOAK_DATABASE_USER=bn_keycloak'
-      - 'KEYCLOAK_DATABASE_PASSWORD=keycloak'
+      - 'KC_DB=postgres'
+      - 'KC_DB_URL_HOST=postgresql'
+      - 'KC_DB_URL_PORT=5432'
+      - 'KC_DB_URL_DATABASE=bitnami_keycloak'
+      - 'KC_DB_USERNAME=bn_keycloak'
+      - 'KC_DB_PASSWORD=keycloak'
       - 'KC_HOSTNAME=https://{{ keycloak.domain }}'
       - 'KC_HOSTNAME_ADMIN=https://{{ keycloak.domain }}'
 
